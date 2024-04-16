@@ -1,0 +1,20 @@
+cloudpickle
+crafter
+gym==0.19.0
+# note that jax needs to be installed separately with the GPU installation
+# instructions in the Jax README, BEFORE installing the other reqs
+jax
+jaxlib
+numpy
+optax
+rich
+ruamel.yaml
+tensorflow-cpu
+tensorflow_probability
+
+# my envs
+# (pinned to specific versions for reproducibility)
+gymnasium
+minigrid==2.2.1
+procgen==0.10.7
+gym-sokoban==0.0.6
