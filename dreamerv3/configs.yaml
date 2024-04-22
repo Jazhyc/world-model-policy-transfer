@@ -222,10 +222,46 @@ minigrid:
   # (probably overkill; maybe copy Atari100k settings)
   envs.amount: 8
   run:
+    script: train_eval
     steps: 1e5
-    eval_eps: 10
     eval_every: 1e4
     train_ratio: 64
+    log_every: 300
+    save_every: 1e4
+    eval_initial: True
+    eval_eps: 5
+    eval_samples: 1
+  encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+  decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+
+minigrid-unlock:
+  task: minigrid_Unlock
+  envs.amount: 8
+  run:
+    script: train_eval
+    steps: 5e5
+    eval_every: 1e4
+    train_ratio: 64
+    log_every: 500
+    save_every: 1e4
+    eval_initial: True
+    eval_eps: 5
+    eval_samples: 1
+  encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+  decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+
+minigrid-test:
+  task: minigrid_Unlock
+  envs.amount: 8
+  run:
+    script: train_eval
+    steps: 1e4
+    eval_every: 1e3
+    train_ratio: 64
+    log_every: 500
+    save_every: 1e3
+    eval_initial: True
+    eval_samples: 1
   encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
   decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
 

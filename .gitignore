@@ -8,3 +8,5 @@ MUJOCO_LOG.TXT
 *.swp
 /logs
 .vscode
+
+cbet/logs

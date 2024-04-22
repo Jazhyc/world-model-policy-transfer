@@ -30,12 +30,17 @@ def train_eval(
 
   nonzeros = set()
   def per_episode(ep, mode):
+    
+    if mode == 'eval':
+      print('Evaluating episode')
+    
     length = len(ep['reward']) - 1
     score = float(ep['reward'].astype(np.float64).sum())
     logger.add({
         'length': length, 'score': score,
         'reward_rate': (ep['reward'] - ep['reward'].min() >= 0.1).mean(),
     }, prefix=('episode' if mode == 'train' else f'{mode}_episode'))
+    logger.write()
     print(f'Episode has {length} steps and return {score:.1f}.')
     stats = {}
     for key in args.log_keys_video:
