@@ -28,6 +28,7 @@ import src.losses as losses
 
 from src.utils import get_batch, log, create_buffers, act
 from src.init_models_and_states import init_models_and_states
+from src.env_utils import make_environment
 
 
 def learn(actor_model,
@@ -118,6 +119,7 @@ def learn(actor_model,
             'visited_states': torch.max(visited_states).item(),
             'mean_episode_length': torch.mean(episode_lengths.float()).item(),
             'mean_episode_return': torch.mean(episode_returns).item(),
+            'episode_return_std': torch.std(episode_returns).item(),
             'total_loss': total_loss.item(),
             'pg_loss': pg_loss.item(),
             'baseline_loss': baseline_loss.item(),
@@ -142,6 +144,48 @@ def learn(actor_model,
         actor_model.load_state_dict(learner_model.state_dict())
         return stats
 
+def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, device='cpu'):
+    """Evaluates the model over a number of episodes and returns the average episode return."""
+    
+    # Create a copy of the learner model
+    learner_model = deepcopy(learner_model).to(device)
+    learner_model.eval()
+    
+    total_rewards = []
+
+    for _ in range(num_episodes):
+        env_output = env.initial()
+        done = False
+        
+        agent_state = learner_model.initial_state(batch_size=1)
+        while not done:
+
+            with torch.no_grad():
+                agent_output, agent_state = learner_model(env_output, agent_state)
+                
+            env_output = env.step(agent_output['action'])
+            
+            done = env_output['done']
+            
+        episode_return = env_output['episode_return'][env_output['done']].item()
+            
+        total_rewards.append(episode_return)
+    
+    print(f"Finished {eval_index} Evaluation Epoch")
+
+    mean_reward = np.mean(total_rewards)
+    std_reward = np.std(total_rewards)
+    
+    # Check if the results file exists, if not create it and write the header
+    if not os.path.exists(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv')):
+        with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'w') as f:
+            f.write('frame,mean_reward,std_reward\n')
+
+    # open csv and append the results with the epoch index
+    with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'a') as f:
+        f.write('%i,%.2f,%.2f\n' % (frame, mean_reward, std_reward))
+        
+    print(f"Mean Reward: {mean_reward}, Std Reward: {std_reward}")
 
 def train(flags):
     if flags.xpid is None:
@@ -187,6 +231,10 @@ def train(flags):
     logger = logging.getLogger('logfile')
 
     frames, stats = 0, {}
+    
+    def evaluate_in_thread(frame, index, model, env, episodes, flags):
+        print('Starting evaluation thread')
+        evaluate_model(frame, index, model, env, episodes, flags)
 
     def batch_and_learn(i, lock=threading.Lock()):
         """Thread target for the learning process."""
@@ -235,7 +283,9 @@ def train(flags):
 
     timer = timeit.default_timer
     try:
+        last_eval_frame = 0
         last_checkpoint_time = timer()
+        eval_index = 0
         while frames < flags.total_frames:
             start_frames = frames
             start_time = timer()
@@ -244,6 +294,16 @@ def train(flags):
             if timer() - last_checkpoint_time > flags.save_interval * 60:
                 checkpoint(frames)
                 last_checkpoint_time = timer()
+                
+            # Evaluate periodically
+            if frames - last_eval_frame >= flags.eval_every_frames or eval_index == 0:
+                print('Evaluating model at %i frames' % frames)
+                eval_env = make_environment(flags, actor_id=0)
+                # Start a new thread for evaluation
+                eval_thread = threading.Thread(target=evaluate_in_thread, args=(frames, eval_index, learner_model, eval_env, flags.eval_episodes, flags))
+                eval_thread.start()
+                last_eval_frame = frames
+                eval_index += 1
 
             fps = (frames - start_frames) / (timer() - start_time)
             if stats.get('episode_returns', None):

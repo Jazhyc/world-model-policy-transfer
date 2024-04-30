@@ -8,6 +8,12 @@ import argparse
 
 parser = argparse.ArgumentParser(description='PyTorch Scalable Agent')
 
+# Training Evaluation
+parser.add_argument('--eval_every_frames', default=10000, type=int,
+                    help='Number of frames between evaluations.')
+parser.add_argument('--eval_episodes', default=8, type=int,
+                    help='Number of episodes to evaluate.')
+
 # C-BET
 parser.add_argument('--count_reset_prob', default=0.001, type=float,
                     help='Counts reset probability at every step during pre-training.')
