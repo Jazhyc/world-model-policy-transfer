@@ -149,7 +149,6 @@ def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, d
     
     # Create a copy of the learner model
     learner_model = deepcopy(learner_model).to(device)
-    learner_model.eval()
     
     total_rewards = []
 

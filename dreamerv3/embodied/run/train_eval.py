@@ -40,7 +40,10 @@ def train_eval(
         'length': length, 'score': score,
         'reward_rate': (ep['reward'] - ep['reward'].min() >= 0.1).mean(),
     }, prefix=('episode' if mode == 'train' else f'{mode}_episode'))
+    
+    # Force the logger to write the episode data
     logger.write()
+    
     print(f'Episode has {length} steps and return {score:.1f}.')
     stats = {}
     for key in args.log_keys_video:
@@ -58,11 +61,11 @@ def train_eval(
         stats[f'max_{key}'] = ep[key].max(0).mean()
     metrics.add(stats, prefix=f'{mode}_stats')
 
-  driver_train = embodied.Driver(train_env)
+  driver_train = embodied.Driver(train_env, mode='train')
   driver_train.on_episode(lambda ep, worker: per_episode(ep, mode='train'))
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(train_replay.add)
-  driver_eval = embodied.Driver(eval_env)
+  driver_eval = embodied.Driver(eval_env, mode='eval')
   driver_eval.on_step(eval_replay.add)
   driver_eval.on_episode(lambda ep, worker: per_episode(ep, mode='eval'))
 
