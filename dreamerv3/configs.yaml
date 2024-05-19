@@ -9,6 +9,9 @@ defaults:
   replay_online: False
   eval_dir: ''
   filter: '.*'
+  intrinsic: False
+  use_pseudocounts: False
+  hash_bits: 128
 
   jax:
     platform: gpu
@@ -172,6 +175,26 @@ crafter:
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
 
+crafter-cbet:
+
+  use_pseudocounts: True
+  task: crafter_reward
+  envs.amount: 8
+  run:
+    log_keys_max: '^log_achievement_.*'
+    log_keys_sum: '^log_reward$'
+    script: train_eval
+    steps: 1.02e6
+    eval_every: 1e4
+    log_every: 1000
+    save_every: 1e5
+    eval_initial: True
+    eval_eps: 8
+    eval_samples: 1
+    train_ratio: 64
+  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
+
 dmc_vision:
 
   task: dmc_walker_walk
@@ -239,7 +262,23 @@ minigrid-unlock:
   envs.amount: 8
   run:
     script: train_eval
-    steps: 5e5
+    steps: 1.02e6
+    eval_every: 1e4
+    train_ratio: 64
+    log_every: 1000
+    save_every: 1e5
+    eval_initial: True
+    eval_eps: 8
+    eval_samples: 1
+  encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+  decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+
+minigrid-unlock-pickup:
+  task: minigrid_UnlockPickup
+  envs.amount: 8
+  run:
+    script: train_eval
+    steps: 1e6
     eval_every: 1e4
     train_ratio: 64
     log_every: 500
@@ -331,7 +370,7 @@ multicpu:
 debug:
 
   jax: {jit: True, prealloc: False, debug: True, platform: cpu}
-  envs: {restart: False, amount: 3}
+  envs: {restart: False, amount: 1}
   wrapper: {length: 100, checks: True}
   run:
     eval_every: 1000

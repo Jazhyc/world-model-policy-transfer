@@ -20,6 +20,7 @@ class Logger:
     self.multiplier = multiplier
     self._last_step = None
     self._last_time = None
+    self._start_time = time.time()
     self._metrics = []
 
   def add(self, mapping, prefix=None):
@@ -142,6 +143,7 @@ class JSONLOutput(AsyncOutput):
     self._pattern = re.compile(pattern)
     self._logdir = path.Path(logdir)
     self._logdir.mkdirs()
+    self._start_time = time.time()
 
   def _write(self, summaries):
     bystep = collections.defaultdict(dict)
@@ -149,7 +151,7 @@ class JSONLOutput(AsyncOutput):
       if len(value.shape) == 0 and self._pattern.search(name):
         bystep[step][name] = float(value)
     lines = ''.join([
-        json.dumps({'step': step, **scalars}) + '\n'
+        json.dumps({'step': step, 'time': time.time() - self._start_time, **scalars}) + '\n'
         for step, scalars in bystep.items()])
     with (self._logdir / self._filename).open('a') as f:
       f.write(lines)

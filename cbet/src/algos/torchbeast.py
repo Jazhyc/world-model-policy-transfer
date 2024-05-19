@@ -30,6 +30,8 @@ from src.utils import get_batch, log, create_buffers, act
 from src.env_utils import make_environment
 from src.init_models_and_states import init_models_and_states
 
+from src.algos.cbet import evaluate_model
+
 
 def learn(actor_model,
           learner_model,
@@ -109,48 +111,48 @@ def learn(actor_model,
         actor_model.load_state_dict(learner_model.state_dict())
         return stats
     
-def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, device='cpu'):
-    """Evaluates the model over a number of episodes and returns the average episode return."""
+# def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, device='cpu'):
+#     """Evaluates the model over a number of episodes and returns the average episode return."""
     
-    # Create a copy of the learner model
-    learner_model = deepcopy(learner_model).to(device)
+#     # Create a copy of the learner model
+#     learner_model = deepcopy(learner_model).to(device)
     
-    total_rewards = []
+#     total_rewards = []
 
-    for _ in range(num_episodes):
-        env_output = env.initial()
-        done = False
+#     for _ in range(num_episodes):
+#         env_output = env.initial()
+#         done = False
         
-        agent_state = learner_model.initial_state(batch_size=1)
-        episode_return = 0
-        while not done:
+#         agent_state = learner_model.initial_state(batch_size=1)
+#         episode_return = 0
+#         while not done:
 
-            with torch.no_grad():
-                agent_output, agent_state = learner_model(env_output, agent_state)
+#             with torch.no_grad():
+#                 agent_output, agent_state = learner_model(env_output, agent_state)
                 
-            env_output = env.step(agent_output['action'])
+#             env_output = env.step(agent_output['action'])
             
-            done = env_output['done']
+#             done = env_output['done']
             
-            episode_return += env_output['reward'].item()
+#             episode_return += env_output['reward'].item()
             
-        total_rewards.append(episode_return)
+#         total_rewards.append(episode_return)
     
-    print(f"Finished {eval_index} Evaluation Epoch")
+#     print(f"Finished {eval_index} Evaluation Epoch")
 
-    mean_reward = np.mean(total_rewards)
-    std_reward = np.std(total_rewards)
+#     mean_reward = np.mean(total_rewards)
+#     std_reward = np.std(total_rewards)
     
-    # Check if the results file exists, if not create it and write the header
-    if not os.path.exists(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv')):
-        with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'w') as f:
-            f.write('frame,mean_reward,std_reward\n')
+#     # Check if the results file exists, if not create it and write the header
+#     if not os.path.exists(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv')):
+#         with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'w') as f:
+#             f.write('frame,mean_reward,std_reward\n')
 
-    # open csv and append the results with the epoch index
-    with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'a') as f:
-        f.write('%i,%.2f,%.2f\n' % (frame, mean_reward, std_reward))
+#     # open csv and append the results with the epoch index
+#     with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'a') as f:
+#         f.write('%i,%.2f,%.2f\n' % (frame, mean_reward, std_reward))
         
-    print(f"Mean Reward: {mean_reward}, Std Reward: {std_reward}")
+#     print(f"Mean Reward: {mean_reward}, Std Reward: {std_reward}")
 
 
 def train(flags):

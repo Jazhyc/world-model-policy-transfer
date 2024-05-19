@@ -162,7 +162,7 @@ def act(i: int, free_queue: mp.SimpleQueue, full_queue: mp.SimpleQueue,
         bias_change = None
         if 'Habitat' in flags.env:
             ego_size = np.prod(env_output["frame"].shape)
-            pano_size = ego_size * 4
+            pano_size = ego_size # * 4, we do not use panoramic views for easier comparison. Egocentric is also better for singular agents.
             proj_dim = flags.hash_bits
             proj_state = np.random.normal(0, 1, (proj_dim, ego_size, 1))
             bias_state = np.random.uniform(-1, 1, (proj_dim, 1))

@@ -41,6 +41,11 @@ def train_eval(
         'reward_rate': (ep['reward'] - ep['reward'].min() >= 0.1).mean(),
     }, prefix=('episode' if mode == 'train' else f'{mode}_episode'))
     
+    if mode == 'train':
+      logger.add({
+        'intrinsic_return': float(ep['intrinsic_reward'].astype(np.float64).sum()),
+      }, prefix='episode')
+    
     # Force the logger to write the episode data
     logger.write()
     
@@ -61,11 +66,12 @@ def train_eval(
         stats[f'max_{key}'] = ep[key].max(0).mean()
     metrics.add(stats, prefix=f'{mode}_stats')
 
-  driver_train = embodied.Driver(train_env, mode='train')
+  driver_train = embodied.Driver(train_env, use_intrinsic_reward=args.intrinsic, 
+                                 use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits)
   driver_train.on_episode(lambda ep, worker: per_episode(ep, mode='train'))
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(train_replay.add)
-  driver_eval = embodied.Driver(eval_env, mode='eval')
+  driver_eval = embodied.Driver(eval_env)
   driver_eval.on_step(eval_replay.add)
   driver_eval.on_episode(lambda ep, worker: per_episode(ep, mode='eval'))
 

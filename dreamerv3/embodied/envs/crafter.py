@@ -24,6 +24,7 @@ class Crafter(embodied.Env):
     spaces = {
         'image': embodied.Space(np.uint8, self._env.observation_space.shape),
         'reward': embodied.Space(np.float32),
+        'intrinsic_reward': embodied.Space(np.float32),
         'is_first': embodied.Space(bool),
         'is_last': embodied.Space(bool),
         'is_terminal': embodied.Space(bool),
@@ -62,6 +63,7 @@ class Crafter(embodied.Env):
     return dict(
         image=image,
         reward=reward,
+        intrinsic_reward=np.float32(0.0),
         is_first=is_first,
         is_last=is_last,
         is_terminal=is_terminal,

@@ -72,6 +72,7 @@ class FromGym(embodied.Env):
     obs = {k: np.asarray(v) for k, v in obs.items()}
     obs.update(
         reward=np.float32(reward),
+        intrinsic_reward=0,
         is_first=is_first,
         is_last=is_last,
         is_terminal=is_terminal)

@@ -30,6 +30,8 @@ from src.utils import get_batch, log, create_buffers, act
 from src.init_models_and_states import init_models_and_states
 from src.env_utils import make_environment
 
+start_time = time.time()
+
 
 def learn(actor_model,
           learner_model,
@@ -126,6 +128,7 @@ def learn(actor_model,
             'entropy_loss': entropy_loss.item(),
             'mean_rewards': torch.mean(rewards).item(),
             'mean_intrinsic_rewards': torch.mean(intrinsic_rewards).item(),
+            'std_intrinsic_rewards': torch.std(intrinsic_rewards).item(),
             'mean_total_rewards': torch.mean(total_rewards).item(),
             'mean_state_rewards': torch.mean(state_rewards).item(),
             'mean_change_rewards': torch.mean(change_rewards).item(),
@@ -178,11 +181,11 @@ def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, d
     # Check if the results file exists, if not create it and write the header
     if not os.path.exists(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv')):
         with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'w') as f:
-            f.write('frame,mean_reward,std_reward\n')
+            f.write('frame,time,mean_reward,std_reward\n')
 
     # open csv and append the results with the epoch index
     with open(os.path.join(flags.savedir, flags.xpid, 'eval_results.csv'), 'a') as f:
-        f.write('%i,%.2f,%.2f\n' % (frame, mean_reward, std_reward))
+        f.write('%i,%.2f,%.2f,%.2f\n' % (frame, time.time() - start_time, mean_reward, std_reward))
         
     print(f"Mean Reward: {mean_reward}, Std Reward: {std_reward}")
 

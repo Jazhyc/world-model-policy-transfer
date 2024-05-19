@@ -30,7 +30,9 @@ def main(argv=None):
   config = embodied.Flags(config).parse(other)
   args = embodied.Config(
       **config.run, logdir=config.logdir,
-      batch_steps=config.batch_size * config.batch_length)
+      batch_steps=config.batch_size * config.batch_length,
+      intrinsic=config.intrinsic, use_pseudocounts=config.use_pseudocounts,
+      hash_bits=config.hash_bits)
   print(config)
 
   logdir = embodied.Path(args.logdir)
@@ -111,6 +113,7 @@ def make_logger(parsed, logdir, step, config):
       embodied.logger.TerminalOutput(config.filter),
       embodied.logger.JSONLOutput(logdir, 'metrics.jsonl'),
       embodied.logger.JSONLOutput(logdir, 'scores.jsonl', 'episode/score'),
+      embodied.logger.JSONLOutput(logdir, 'scores.jsonl', 'episode/intrinsic_return'),
       embodied.logger.TensorBoardOutput(logdir),
       # embodied.logger.WandBOutput(logdir.name, config),
       # embodied.logger.MLFlowOutput(logdir.name),
@@ -136,6 +139,8 @@ def make_replay(
     replay = embodied.replay.NaiveChunks(length, size, directory)
   else:
     raise NotImplementedError(config.replay)
+  print("Replay Buffer Length: ", replay.length)
+  print("Replay Buffer Capacity: ", replay.capacity)
   return replay
 
 

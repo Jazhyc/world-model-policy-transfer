@@ -53,6 +53,7 @@ class FromGymnasium(embodied.Env, Generic[U, V]):
     return {
         **spaces,
         'reward': embodied.Space(np.float32),
+        'intrinsic_reward': embodied.Space(np.float32),
         'is_first': embodied.Space(bool),
         'is_last': embodied.Space(bool),
         'is_terminal': embodied.Space(bool),
@@ -95,6 +96,7 @@ class FromGymnasium(embodied.Env, Generic[U, V]):
     np_obs: Dict[str, Any] = {k: np.asarray(v) for k, v in obs.items()}
     np_obs.update(
         reward=np.float32(reward),
+        intrinsic_reward=0, # Will be calculated in the driver. Placeholder to work with logger
         is_first=is_first,
         is_last=is_last,
         is_terminal=is_terminal)

@@ -312,7 +312,8 @@ class EnvironmentMiniGrid:
         reward = torch.tensor(reward).view(1, 1)
         done = torch.tensor(done, dtype=torch.bool).view(1, 1)
         real_done = torch.tensor(real_done, dtype=torch.bool).view(1, 1)
-        pano = _format_observation(self.get_panorama())
+        # pano = _format_observation(self.get_panorama())
+        pano = frame # Egocentric view
 
         return dict(
             panorama=pano, # This is four partial obs (panoramic view)
