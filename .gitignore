@@ -12,6 +12,6 @@ MUJOCO_LOG.TXT
 *.tar
 *.ckpt
 *.npz
-
+*.v2
 
 cbet/logs
