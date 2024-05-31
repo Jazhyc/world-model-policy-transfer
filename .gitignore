@@ -14,5 +14,3 @@ MUJOCO_LOG.TXT
 *.npz
 *.v2
 *.old
-
-cbet/logs
