@@ -1,0 +1,3 @@
+Saving logs data to ../logs/impala/unlock-tabula-rasa-1M-coeff-0.0025/logs.csv
+Saving logs' fields to ../logs/impala/unlock-tabula-rasa-1M-coeff-0.0025/fields.csv
+Updated log fields: ['_tick', '_time', 'frames', 'total_episodes', 'episode_wins', 'interactions', 'visited_states', 'mean_episode_length', 'mean_episode_return', 'episode_return_std', 'total_loss', 'pg_loss', 'baseline_loss', 'entropy_loss', 'mean_rewards', 'mean_intrinsic_rewards', 'std_intrinsic_rewards', 'mean_total_rewards', 'mean_state_rewards', 'mean_change_rewards', 'state_counts', 'change_counts', 'state_counts_std', 'change_counts_std']
