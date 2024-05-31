@@ -53,7 +53,7 @@ impala_scores = process_and_average_scores(
 
 impala_cbet_scores = process_and_average_scores(
     base_path=cbet_logs, 
-    sub_path='cbet-20240512-120923/', 
+    sub_path='unlock-tabula-rasa-1M-ego/', 
     filename=cbet_filename, 
     process_func=process_impala_scores, 
     score_key=None, 
@@ -99,9 +99,33 @@ dreamer_cbet_scores = process_and_average_scores(
     window=crafter_window
 )
 
+impala_scores = process_and_average_scores(
+    base_path=cbet_logs, 
+    sub_path='crafter-base-1M/', 
+    filename=cbet_filename, 
+    process_func=process_impala_scores, 
+    score_key=None, 
+    step_limit=step_limit, 
+    num_eval_episodes=num_eval_episodes,
+    window=crafter_window
+)
+
+impala_cbet_scores = process_and_average_scores(
+    base_path=cbet_logs, 
+    sub_path='crafter-tabula-rasa-1M/', 
+    filename=cbet_filename, 
+    process_func=process_impala_scores, 
+    score_key=None, 
+    step_limit=step_limit, 
+    num_eval_episodes=num_eval_episodes,
+    window=crafter_window
+)
+
 df_dreamer = create_df(dreamer_scores, 'DreamerV3')
 df_cbet_dreamer = create_df(dreamer_cbet_scores, 'DreamerV3 (CBET)')
+df_impala = create_df(impala_scores, 'IMPALA')
+df_cbet_impala = create_df(impala_cbet_scores, 'IMPALA (CBET)')
 
-df = pd.concat([df_dreamer, df_cbet_dreamer])
+df = pd.concat([df_dreamer, df_cbet_dreamer, df_impala, df_cbet_impala])
 
 plot_scores(df, step_limit, 'Extrinsic', 'Crafter', y_lim=10)

@@ -50,3 +50,31 @@ df = pd.concat([df_cbet_dreamer, df_cbet_impala])
 
 # Plot the scores
 plot_scores(df, step_limit, 'intrinsic', 'Minigrid', y_lim=None)
+
+dreamer_cbet_scores = process_and_average_scores(
+    dreamer_logs,
+    'dreamerv3/crafter-tabula-rasa-1M/',
+    dreamer_filename,
+    process_intrinsic_dreamer_scores,
+    'episode/intrinsic_return',
+    step_limit,
+    num_eval_episodes,
+    window_size
+)
+
+impala_cbet_scores = process_and_average_scores(
+    cbet_logs,
+    'crafter-tabula-rasa-1M/',
+    cbet_filename,
+    process_intrinsic_impala_scores,
+    None,
+    step_limit,
+    num_eval_episodes,
+    window_size
+)
+
+df_cbet_dreamer = create_df(dreamer_cbet_scores, 'DreamerV3 (CBET)')
+df_cbet_impala = create_df(impala_cbet_scores, 'IMPALA (CBET)')
+df = pd.concat([df_cbet_dreamer, df_cbet_impala])
+
+plot_scores(df, step_limit, 'intrinsic', 'Crafter', y_lim=None)

@@ -110,7 +110,8 @@ def learn(actor_model,
 
         actor_model.load_state_dict(learner_model.state_dict())
         return stats
-    
+
+# Commented for posterity
 # def evaluate_model(frame, eval_index, learner_model, env, num_episodes, flags, device='cpu'):
 #     """Evaluates the model over a number of episodes and returns the average episode return."""
     

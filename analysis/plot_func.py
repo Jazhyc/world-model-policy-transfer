@@ -28,9 +28,9 @@ def plot_scores(df, step_limit, reward_type, env_name, y_lim=1.0):
         labels.append(label)
 
     plt.legend(lines, labels)
-    plt.xlabel('Time step (in millions)')
+    plt.xlabel('Time step (in Millions)')
     plt.ylabel(f'Mean {reward_type.capitalize()} Return')
-    plt.title(f"{env_name.capitalize()} {reward_type} Return over Time")
+    plt.title(f"{env_name.capitalize()} {reward_type.capitalize()} Return over Time")
     plt.grid()
     plt.ylim(0, y_lim)
     plt.xlim(0, step_limit)

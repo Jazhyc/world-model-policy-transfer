@@ -6,7 +6,12 @@ __pycache__/
 MUJOCO_LOG.TXT
 ;
 *.swp
-/logs
+
 .vscode
+
+*.tar
+*.ckpt
+*.npz
+
 
 cbet/logs

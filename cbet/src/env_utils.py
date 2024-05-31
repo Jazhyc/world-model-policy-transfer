@@ -14,6 +14,9 @@ import itertools
 from copy import deepcopy
 import os
 import pathlib
+import crafter
+
+import matplotlib.pyplot as plt
 
 from gym_minigrid.minigrid import OBJECT_TO_IDX, COLOR_TO_IDX, STATE_TO_IDX
 
@@ -107,6 +110,9 @@ def make_gym_env(env_id, seed=0):
     if 'MiniGrid' in env_id:
         env = MiniGridWrapper(gym.make(env_id))
         env.seed(seed)
+        
+    elif 'Crafter' in env_id:
+        env = CrafterWrapper(crafter.Env(size=(64, 64), reward=True, seed=seed))
 
     elif 'HabitatNav' in env_id:
         config_file = os.path.join(pathlib.Path(__file__).parent.resolve(),
@@ -160,6 +166,8 @@ def make_environment(flags, actor_id=1):
         # If fixed_seed is defined, the env seed will be set at every reset(),
         # resulting in the same grid being generated at every episode
         return EnvironmentMiniGrid(gym_envs, no_task=flags.no_reward, fixed_seed=flags.fixed_seed)
+    elif 'Crafter' in flags.env:
+        return CrafterEnvironment(gym_envs, no_task=flags.no_reward)
     elif 'HabitatNav' in flags.env:
         # In Habitat, the scene is not randomized, so there is no fixed_seed
         # dictpath is used to save visitation dictionaries (for heatmaps)
@@ -226,7 +234,8 @@ class EnvironmentMiniGrid:
         if self.fixed_seed is not None:
             self.gym_env.seed(seed=self.fixed_seed)
         initial_frame = _format_observation(self.gym_env.reset())
-        initial_pano = _format_observation(self.get_panorama())
+        # initial_pano = _format_observation(self.get_panorama())
+        initial_pano = initial_frame # Egocentric view
 
         return dict(
             panorama=initial_pano,
@@ -331,7 +340,108 @@ class EnvironmentMiniGrid:
     def close(self):
         for e in self.all_envs:
             e.close()
+            
+# ------------------------------------------------------------------------------
+# Crafter wrappers
+# ------------------------------------------------------------------------------
 
+class CrafterWrapper(gym.Wrapper):
+    def __init__(self, env):
+        gym.ObservationWrapper.__init__(self, env)
+    
+class CrafterEnvironment:
+    def __init__(self, gym_envs, no_task=False, fixed_seed=None):
+        self.all_envs = gym_envs
+        self.env_iter = itertools.cycle(gym_envs)
+        self.gym_env = next(self.env_iter)
+        self.episode_return = None
+        self.episode_step = None
+        self.episode_win = None
+        self.interactions = None
+        self.fixed_seed = fixed_seed
+        self.interactions_dict = dict()
+        self.true_state_count = dict()
+        
+    def initial(self):
+        initial_reward = torch.zeros(1, 1)
+        self.episode_return = torch.zeros(1, 1)
+        self.episode_step = torch.zeros(1, 1, dtype=torch.int32)
+        self.episode_win = torch.zeros(1, 1, dtype=torch.int32)
+        self.interactions = torch.zeros(1, 1, dtype=torch.int32)
+        self.interactions_dict = dict()
+        if self.fixed_seed is not None:
+            self.gym_env.seed(seed=self.fixed_seed)
+        initial_done = torch.tensor(False, dtype=torch.bool).view(1, 1)
+        initial_real_done = torch.tensor(False, dtype=torch.bool).view(1, 1)
+        initial_frame = _format_observation(self.gym_env.reset())
+        initial_pano = initial_frame # No difference between frame and pano
+
+        return dict(
+            panorama=initial_pano,
+            frame=initial_frame,
+            reward=initial_reward,
+            done=initial_done,
+            real_done=initial_real_done,
+            episode_return=self.episode_return,
+            episode_step=self.episode_step,
+            episode_win=self.episode_win,
+            interactions=self.interactions,
+            visited_states=torch.tensor(len(self.true_state_count)).view(1, 1),
+        )
+        
+    def step(self, action):
+        prev_env_str = str(self.gym_env)
+        frame, reward, done, _ = self.gym_env.step(action.item())
+        env_str = str(self.gym_env)
+
+        # Count interactions
+        if action.item() in [3, 4, 5] and prev_env_str != env_str: # Something changed
+            interaction_key = (prev_env_str, env_str)
+            if interaction_key not in self.interactions_dict: # New unique change
+                self.interactions_dict[interaction_key] = 1
+                self.interactions[0][0] = 1
+            else: # Change is not unique
+                self.interactions_dict[interaction_key] += 1
+                self.interactions[0][0] = 0
+        else:
+            self.interactions[0][0] = 0
+        interactions = self.interactions
+
+        # Update episode step and return
+        self.episode_step += 1
+        episode_step = self.episode_step
+        self.episode_return += reward
+        episode_return = self.episode_return
+
+        # Handle terminal states
+        real_done = done
+        if real_done:
+            self.gym_env = next(self.env_iter)
+            if self.fixed_seed is not None:
+                self.gym_env.seed(seed=self.fixed_seed)
+            frame = self.gym_env.reset()
+            self.episode_return = torch.zeros(1, 1)
+            self.episode_step = torch.zeros(1, 1, dtype=torch.int32)
+            self.episode_win = torch.zeros(1, 1, dtype=torch.int32)
+            self.interactions = torch.zeros(1, 1, dtype=torch.int32)
+            self.interactions_dict.clear()
+
+        # Format frame and done
+        frame = _format_observation(frame)
+        panorama = frame # No difference between frame and pano
+        done = torch.tensor(done, dtype=torch.bool).view(1, 1)
+        real_done = torch.tensor(real_done, dtype=torch.bool).view(1, 1)
+
+        return dict(
+            panorama=panorama,
+            frame=frame,
+            reward=reward,
+            done=done,
+            real_done=real_done,
+            episode_return=episode_return,
+            episode_step=episode_step,
+            interactions=interactions,
+        )
 
 # ------------------------------------------------------------------------------
 # Habitat wrappers

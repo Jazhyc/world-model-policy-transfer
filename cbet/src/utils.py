@@ -160,7 +160,7 @@ def act(i: int, free_queue: mp.SimpleQueue, full_queue: mp.SimpleQueue,
         bias_state = None
         proj_change = None
         bias_change = None
-        if 'Habitat' in flags.env:
+        if 'Habitat' in flags.env or 'Crafter' in flags.env:
             ego_size = np.prod(env_output["frame"].shape)
             pano_size = ego_size # * 4, we do not use panoramic views for easier comparison. Egocentric is also better for singular agents.
             proj_dim = flags.hash_bits
