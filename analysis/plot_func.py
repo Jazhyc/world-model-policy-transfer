@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+import numpy as np
 
 def create_df(data, label):
     df = pd.DataFrame(data, columns=['step', 'mean_return', 'std_error_return'])
@@ -22,7 +23,14 @@ def plot_scores(df, step_limit, reward_type, env_name, y_lim=1.0):
     }
 
     for label, group in df.groupby('label'):
-        line, = plt.plot(group['step'], group['mean_return'], color_dict[label])
+        
+        if label in color_dict:
+            color = color_dict[label]
+        else:
+            # Generate a random color in hex
+            color = '#{:06x}'.format(np.random.randint(0, 256**3))
+        
+        line, = plt.plot(group['step'], group['mean_return'], color)
         plt.fill_between(group['step'], group['mean_return'] - group['std_error_return'], group['mean_return'] + group['std_error_return'], alpha=0.2, color=line.get_color())
         lines.append(line)
         labels.append(label)

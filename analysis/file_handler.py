@@ -126,7 +126,11 @@ def process_intrinsic_impala_scores(filepath, step_limit=1e6, num_eval_episodes=
             break
         
         mean = float(row['mean_intrinsic_rewards']) * float(row['mean_episode_length'])
-        std = float(row['std_intrinsic_rewards'])
+        
+        if 'std_intrinsic_rewards' in row:
+            std = float(row['std_intrinsic_rewards'])
+        else:
+            std = 0
 
         mean = 0 if math.isnan(mean) else mean
         std = 0 if math.isnan(std) else std
