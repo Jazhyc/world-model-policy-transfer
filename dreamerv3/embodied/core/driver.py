@@ -32,7 +32,7 @@ class Driver:
       bool: bool,
   }
 
-  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, intr_reward_coeff=0.001 **kwargs):
+  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, intr_reward_coeff=0.001, **kwargs):
     assert len(env) > 0
     self._env = env
     self._kwargs = kwargs

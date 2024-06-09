@@ -13,4 +13,4 @@ module load Python/3.10.8-GCCcore-12.2.0
 module load CUDA/12.1.1
 source $HOME/venvs/dreamerv3/bin/activate
 cd ..
-python -m dreamerv3 --configs minigrid-test --logdir ./logs/dreamerv3/minigrid-habrok-test --batch_size 16 --intrinsic True --hash_bits 128 --use_pseudocounts False
+python -m dreamerv3 --configs minigrid-test --logdir ./logs/dreamerv3/minigrid-habrok-test --batch_size 16 --intrinsic True --hash_bits 128 --use_pseudocounts False --intr_reward_coeff 0.001
