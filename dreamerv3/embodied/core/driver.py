@@ -32,14 +32,14 @@ class Driver:
       bool: bool,
   }
 
-  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, **kwargs):
+  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, intr_reward_coeff=0.001 **kwargs):
     assert len(env) > 0
     self._env = env
     self._kwargs = kwargs
     self._on_steps = []
     self._on_episodes = []
     self.count_reset_prob = 0.001
-    self.intr_reward_coeff = 0.005
+    self.intr_reward_coeff = intr_reward_coeff
     self.state_counts = dict()
     self.change_counts = dict()
     self.use_intrinsic_reward = use_intrinsic_reward

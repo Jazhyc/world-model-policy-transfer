@@ -32,7 +32,7 @@ def main(argv=None):
       **config.run, logdir=config.logdir,
       batch_steps=config.batch_size * config.batch_length,
       intrinsic=config.intrinsic, use_pseudocounts=config.use_pseudocounts,
-      hash_bits=config.hash_bits)
+      hash_bits=config.hash_bits, intr_reward_coeff=config.intr_reward_coeff)
   print(config)
 
   logdir = embodied.Path(args.logdir)

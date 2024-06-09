@@ -67,7 +67,8 @@ def train_eval(
     metrics.add(stats, prefix=f'{mode}_stats')
 
   driver_train = embodied.Driver(train_env, use_intrinsic_reward=args.intrinsic, 
-                                 use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits)
+                                 use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits,
+                                 intr_reward_coeff=args.intr_reward_coeff)
   driver_train.on_episode(lambda ep, worker: per_episode(ep, mode='train'))
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(train_replay.add)
