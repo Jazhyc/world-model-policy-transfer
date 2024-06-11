@@ -12,7 +12,7 @@ coeff_strength=(0.001 0.0025 0.005)
 
 module load Python/3.10.8-GCCcore-12.2.0
 module load CUDA/12.1.1
-module load FFmpeg/6.0-GCCcore-12.3.0
+# module load FFmpeg/6.0-GCCcore-12.3.0
 source $HOME/venvs/dreamerv3/bin/activate
 cd ..
 python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-coeff-${coeff_strength[${SLURM_ARRAY_TASK_ID}]} --batch_size 16 --run.intrinsic True --run.use_pseudocounts False --run.intr_reward_coeff ${coeff_strength[${SLURM_ARRAY_TASK_ID}]}
