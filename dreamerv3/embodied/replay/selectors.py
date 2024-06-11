@@ -13,6 +13,9 @@ class Fifo:
 
   def __setitem__(self, key, steps):
     self.queue.append(key)
+    
+  def clear(self):
+    self.queue.clear()
 
   def __delitem__(self, key):
     if self.queue[0] == key:
@@ -28,6 +31,10 @@ class Uniform:
     self.indices = {}
     self.keys = []
     self.rng = np.random.default_rng(seed)
+    
+  def clear(self):
+    self.indices.clear()
+    self.keys.clear()
 
   def __call__(self):
     index = self.rng.integers(0, len(self.keys)).item()

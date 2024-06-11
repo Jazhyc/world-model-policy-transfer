@@ -18,6 +18,12 @@ class Greedy(nj.Module):
       raise NotImplementedError(config.critic_type)
     self.ac = agent.ImagActorCritic(
         critics, {'extr': 1.0}, act_space, config, name='ac')
+    
+  def get_actor_logits(self, state):
+    return self.ac.get_actor_logits(state)
+  
+  def get_actor_dist(self, state):
+    return self.ac.get_actor_dist(state)
 
   def initial(self, batch_size):
     return self.ac.initial(batch_size)

@@ -50,6 +50,7 @@ defaults:
     use_pseudocounts: False
     hash_bits: 128
     transfer: False
+    ignore_extr_reward: False
 
   envs: {amount: 4, parallel: process, length: 0, reset: True, restart: True, discretize: 0, checks: False}
   wrapper: {length: 0, reset: True, discretize: 0, checks: False}
@@ -293,10 +294,10 @@ minigrid-unlock-pickup:
 
 minigrid-test:
   task: minigrid_Unlock
-  envs.amount: 8
+  envs.amount: 1
   run:
     script: train_eval
-    steps: 1e4
+    steps: 3e3
     eval_every: 1e3
     train_ratio: 64
     log_every: 500

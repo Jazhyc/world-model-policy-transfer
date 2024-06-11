@@ -68,7 +68,7 @@ def train_eval(
 
   driver_train = embodied.Driver(train_env, use_intrinsic_reward=args.intrinsic, 
                                  use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits,
-                                 intr_reward_coeff=args.intr_reward_coeff)
+                                 intr_reward_coeff=args.intr_reward_coeff, ignore_extr_reward=args.ignore_extr_reward)
   driver_train.on_episode(lambda ep, worker: per_episode(ep, mode='train'))
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(train_replay.add)
@@ -116,26 +116,19 @@ def train_eval(
   checkpoint = embodied.Checkpoint(logdir / 'checkpoint.ckpt')
   checkpoint.step = step
   checkpoint.agent = agent
-  checkpoint.train_replay = train_replay
-  checkpoint.eval_replay = eval_replay
+  
+  if not args.transfer:
+    checkpoint.train_replay = train_replay
+    checkpoint.eval_replay = eval_replay
+  
   if args.from_checkpoint:
     checkpoint.load(args.from_checkpoint)
     
     if args.transfer:
-      
-      # Reset replay buffers
-      train_replay.reset()
-      eval_replay.reset()
-      
-      # Prefill train dataset.
-      while len(train_replay) < max(args.batch_steps, args.train_fill):
-        driver_train(random_agent.policy, steps=100)
-      # Prefill eval dataset.
-      while len(eval_replay) < max(args.batch_steps, args.eval_fill):
-        driver_eval(random_agent.policy, steps=100)
-        
-      # Set agent to transfer mode
-      agent.set_transfer(True)
+            
+      # Set agent to transfer mode, nesting is necessary for some reason
+      agent.agent.set_transfer(True)
+      print("Agent is in transfer mode")
     
   checkpoint.load_or_save()
   should_save(step)  # Register that we jused saved.

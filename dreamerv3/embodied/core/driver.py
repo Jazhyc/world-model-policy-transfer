@@ -32,7 +32,7 @@ class Driver:
       bool: bool,
   }
 
-  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, intr_reward_coeff=0.001, **kwargs):
+  def __init__(self, env, use_intrinsic_reward=False, use_pseudocounts=False, hash_bits=128, intr_reward_coeff=0.001, ignore_extr_reward=False, **kwargs):
     assert len(env) > 0
     self._env = env
     self._kwargs = kwargs
@@ -43,6 +43,7 @@ class Driver:
     self.state_counts = dict()
     self.change_counts = dict()
     self.use_intrinsic_reward = use_intrinsic_reward
+    self.ignore_extrinsic_reward = ignore_extr_reward
     
     proj_size = np.prod(env.obs_space['image'].shape)
     proj_dim = hash_bits
@@ -124,6 +125,10 @@ class Driver:
   def calc_intrinsic_reward(self, obs):
         
     extr_reward = obs['reward']
+    
+    # Used during pretraining
+    if self.ignore_extrinsic_reward:
+      extr_reward = np.zeros_like(extr_reward)
     
     # Compute difference between next and current state
     state_diff = obs['image'] - self._current_obs_img

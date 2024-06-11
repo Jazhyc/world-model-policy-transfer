@@ -31,7 +31,7 @@ class Agent(nj.Module):
     self.obs_space = obs_space
     self.act_space = act_space['action']
     self.step = step
-    self.wm = WorldModel(obs_space, act_space, config, name='wm')
+    self.wm = WorldModel(obs_space, self.act_space, config, name='wm')
 
     self.task_behavior = getattr(behaviors, config.task_behavior)(
         self.wm, self.act_space, self.config, name='task_behavior')
@@ -46,8 +46,16 @@ class Agent(nj.Module):
     self.transfer_behavior = None
 
   def policy_initial(self, batch_size):
+    
+    prev_latent, prev_action = self.wm.initial(batch_size)
+    
+    if self.transfer_wm is None:
+      prev_transfer_latent, _ = self.wm.initial(batch_size)
+    else:
+      prev_transfer_latent, _ = self.transfer_wm.initial(batch_size)
+    
     return (
-        self.wm.initial(batch_size),
+        (prev_latent, prev_transfer_latent, prev_action),
         self.task_behavior.initial(batch_size),
         self.expl_behavior.initial(batch_size))
 
@@ -57,11 +65,14 @@ class Agent(nj.Module):
   def policy(self, obs, state, mode='train'):
     self.config.jax.jit and print('Tracing policy function.')
     obs = self.preprocess(obs)
-    (prev_latent, prev_action), task_state, expl_state = state
+    (prev_latent, prev_transfer_latent, prev_action), task_state, expl_state = state
     embed = self.wm.encoder(obs)
     latent, _ = self.wm.rssm.obs_step(
         prev_latent, prev_action, embed, obs['is_first'])
     self.expl_behavior.policy(latent, expl_state)
+    
+    # If not in transfer mode, use normal latent
+    transfer_latent = latent
     
     if not self.transfer_policy:
       task_outs, task_state = self.task_behavior.policy(latent, task_state)
@@ -70,7 +81,7 @@ class Agent(nj.Module):
       
       transfer_embed = self.transfer_wm.encoder(obs)
       transfer_latent, _ = self.transfer_wm.rssm.obs_step(
-          prev_latent, prev_action, transfer_embed, obs['is_first'])
+          prev_transfer_latent, prev_action, transfer_embed, obs['is_first'])
       
       task_logits = self.task_behavior.get_actor_logits(latent)
       expl_logits = self.expl_behavior.get_actor_logits(latent)
@@ -83,8 +94,11 @@ class Agent(nj.Module):
       expl_logits = expl_logits + transfer_expl_logits
       
       # Create distributions
-      task_outs = self.task_behavior.get_actor_dist(task_logits)
-      expl_outs = self.expl_behavior.get_actor_dist(expl_logits)
+      task_dist = self.task_behavior.get_actor_dist(task_logits)
+      expl_dist = self.expl_behavior.get_actor_dist(expl_logits)
+      
+      task_outs = {'action' : task_dist}
+      expl_outs = {'action' : expl_dist}
       
     if mode == 'eval':
       outs = task_outs
@@ -98,7 +112,7 @@ class Agent(nj.Module):
       outs = task_outs
       outs['log_entropy'] = outs['action'].entropy()
       outs['action'] = outs['action'].sample(seed=nj.rng())
-    state = ((latent, outs['action']), task_state, expl_state)
+    state = ((latent, transfer_latent, outs['action']), task_state, expl_state)
     return outs, state
 
   def train(self, data, state):
@@ -146,7 +160,7 @@ class Agent(nj.Module):
     self.transfer_policy = useTransfer
     
     self.transfer_wm = self.wm
-    self.wm = WorldModel(self.obs_space, self.act_space, self.config, name='task_wm')
+    self.wm = WorldModel(self.obs_space, self.act_space, self.config, name='wm')
     
     self.transfer_behavior = self.task_behavior
     self.task_behavior = getattr(behaviors, self.config.task_behavior)(
@@ -155,9 +169,9 @@ class Agent(nj.Module):
 
 class WorldModel(nj.Module):
 
-  def __init__(self, obs_space, act_space, config):
+  def __init__(self, obs_space, act_space_action, config):
     self.obs_space = obs_space
-    self.act_space = act_space['action']
+    self.act_space = act_space_action
     self.config = config
     shapes = {k: tuple(v.shape) for k, v in obs_space.items()}
     shapes = {k: v for k, v in shapes.items() if not k.startswith('log_')}
