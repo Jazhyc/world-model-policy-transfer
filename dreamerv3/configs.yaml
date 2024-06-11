@@ -199,10 +199,9 @@ crafter-cbet:
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
 
 crafter-pre-train:
-  use_pseudocounts: True
   task: crafter_reward
   envs.amount: 8
-  seed: 42 # Constant during pre-training as we want to test generalizability
+  seed: 42 # Constant during pre-training as we want to test generalization
   run:
     log_keys_max: '^log_achievement_.*'
     log_keys_sum: '^log_reward$'
@@ -218,6 +217,7 @@ crafter-pre-train:
     intrinsic: True
     ignore_extr_reward: True
     intr_reward_coeff: 0.0025
+    use_pseudocounts: True
     transfer: True
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
