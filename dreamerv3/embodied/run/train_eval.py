@@ -67,7 +67,8 @@ def train_eval(
     metrics.add(stats, prefix=f'{mode}_stats')
 
   driver_train = embodied.Driver(train_env, use_intrinsic_reward=args.intrinsic, 
-                                 use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits)
+                                 use_pseudocounts=args.use_pseudocounts, hash_bits=args.hash_bits,
+                                 intr_reward_coeff=args.intr_reward_coeff)
   driver_train.on_episode(lambda ep, worker: per_episode(ep, mode='train'))
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(train_replay.add)
@@ -119,6 +120,23 @@ def train_eval(
   checkpoint.eval_replay = eval_replay
   if args.from_checkpoint:
     checkpoint.load(args.from_checkpoint)
+    
+    if args.transfer:
+      
+      # Reset replay buffers
+      train_replay.reset()
+      eval_replay.reset()
+      
+      # Prefill train dataset.
+      while len(train_replay) < max(args.batch_steps, args.train_fill):
+        driver_train(random_agent.policy, steps=100)
+      # Prefill eval dataset.
+      while len(eval_replay) < max(args.batch_steps, args.eval_fill):
+        driver_eval(random_agent.policy, steps=100)
+        
+      # Set agent to transfer mode
+      agent.set_transfer(True)
+    
   checkpoint.load_or_save()
   should_save(step)  # Register that we jused saved.
 

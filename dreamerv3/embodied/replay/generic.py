@@ -113,6 +113,12 @@ class Generic:
     del self.table[key]
     del self.remover[key]
     del self.sampler[key]
+    
+  # Remove all entries, used during transfer
+  def reset(self):
+    self.table.clear()
+    self.remover.clear()
+    self.sampler.clear()
 
   def dataset(self):
     while True:

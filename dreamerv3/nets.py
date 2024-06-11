@@ -422,6 +422,22 @@ class MLP(nj.Module):
     self._dist = {k: v for k, v in kw.items() if k in distkeys}
 
   def __call__(self, inputs):
+    x = self.get_logits(inputs)
+    return self.get_distribution(x)
+    
+    
+  def get_distribution(self, logits):
+    if self._shape is None:
+      return logits
+    elif isinstance(self._shape, tuple):
+      return self._out('out', self._shape, logits)
+    elif isinstance(self._shape, dict):
+      return {k: self._out(k, v, logits) for k, v in self._shape.items()}
+    else:
+      raise ValueError(self._shape)
+  
+  # Gets the final activations of the MLP before the output layer.
+  def get_logits(self, inputs):
     feat = self._inputs(inputs)
     if self._symlog_inputs:
       feat = jaxutils.symlog(feat)
@@ -430,14 +446,7 @@ class MLP(nj.Module):
     for i in range(self._layers):
       x = self.get(f'h{i}', Linear, self._units, **self._dense)(x)
     x = x.reshape(feat.shape[:-1] + (x.shape[-1],))
-    if self._shape is None:
-      return x
-    elif isinstance(self._shape, tuple):
-      return self._out('out', self._shape, x)
-    elif isinstance(self._shape, dict):
-      return {k: self._out(k, v, x) for k, v in self._shape.items()}
-    else:
-      raise ValueError(self._shape)
+    return x
 
   def _out(self, name, shape, x):
     return self.get(f'dist_{name}', Dist, shape, **self._dist)(x)

@@ -15,3 +15,4 @@ MUJOCO_LOG.TXT
 *.v2
 *.old
 *.out
+*.png
