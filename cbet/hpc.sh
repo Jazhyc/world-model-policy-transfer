@@ -7,8 +7,8 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=10gb
 #SBATCH --job-name=minigrid-hyperparam-search
-#SBATCH --array=0-2
-coeff_strength=(0.001 0.0025 0.005)
+## SBATCH --array=0-2
+#coeff_strength=(0.001 0.0025 0.005)
 
 module load Python/3.8.16-GCCcore-11.2.0 
 module load CUDA/12.1.1

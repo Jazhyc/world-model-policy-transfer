@@ -46,7 +46,7 @@ defaults:
     actor_addr: 'ipc:///tmp/5551'
     actor_batch: 32
     intrinsic: False
-    intr_reward_coeff: 0.001
+    intr_reward_coeff: 0.0025
     use_pseudocounts: False
     hash_bits: 128
     transfer: False
@@ -198,6 +198,30 @@ crafter-cbet:
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
 
+crafter-pre-train:
+  use_pseudocounts: True
+  task: crafter_reward
+  envs.amount: 8
+  seed: 42 # Constant during pre-training as we want to test generalizability
+  run:
+    log_keys_max: '^log_achievement_.*'
+    log_keys_sum: '^log_reward$'
+    script: train_eval
+    steps: 1.02e6
+    eval_every: 1e4
+    log_every: 1000
+    save_every: 1e5
+    eval_initial: True
+    eval_eps: 8
+    eval_samples: 1
+    train_ratio: 64
+    intrinsic: True
+    ignore_extr_reward: True
+    intr_reward_coeff: 0.0025
+    transfer: True
+  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
+
 dmc_vision:
 
   task: dmc_walker_walk
@@ -273,6 +297,26 @@ minigrid-unlock:
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
+  encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+  decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
+
+minigrid-pre-train:
+  task: minigrid_DoorKey-8x8
+  envs.amount: 8
+  run:
+    script: train_eval
+    steps: 1.02e6
+    eval_every: 1e4
+    train_ratio: 64
+    log_every: 1000
+    save_every: 1e5
+    eval_initial: True
+    eval_eps: 8
+    eval_samples: 1
+    intrinsic: True
+    ignore_extr_reward: True
+    intr_reward_coeff: 0.0025
+    transfer: True
   encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
   decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
 
