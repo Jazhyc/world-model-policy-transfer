@@ -15,4 +15,4 @@ module load CUDA/12.1.1
 module load FFmpeg/6.0-GCCcore-12.3.0
 source $HOME/venvs/dreamerv3/bin/activate
 cd ..
-python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-coeff-${coeff_strength[${SLURM_ARRAY_TASK_ID}]} --batch_size 16 --intrinsic True --hash_bits 128 --use_pseudocounts False --intr_reward_coeff ${coeff_strength[${SLURM_ARRAY_TASK_ID}]}
+python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-coeff-${coeff_strength[${SLURM_ARRAY_TASK_ID}]} --batch_size 16 --run.intrinsic True --run.use_pseudocounts False --run.intr_reward_coeff ${coeff_strength[${SLURM_ARRAY_TASK_ID}]}

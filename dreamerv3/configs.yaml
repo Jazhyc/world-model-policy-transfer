@@ -9,10 +9,6 @@ defaults:
   replay_online: False
   eval_dir: ''
   filter: '.*'
-  intrinsic: False
-  intr_reward_coeff: 0.001
-  use_pseudocounts: False
-  hash_bits: 128
 
   jax:
     platform: gpu
@@ -49,6 +45,11 @@ defaults:
     # actor_addr: 'tcp://127.0.0.1:5551'
     actor_addr: 'ipc:///tmp/5551'
     actor_batch: 32
+    intrinsic: False
+    intr_reward_coeff: 0.001
+    use_pseudocounts: False
+    hash_bits: 128
+    transfer: False
 
   envs: {amount: 4, parallel: process, length: 0, reset: True, restart: True, discretize: 0, checks: False}
   wrapper: {length: 0, reset: True, discretize: 0, checks: False}
@@ -295,7 +296,7 @@ minigrid-test:
   envs.amount: 8
   run:
     script: train_eval
-    steps: 5e4
+    steps: 1e4
     eval_every: 1e3
     train_ratio: 64
     log_every: 500
