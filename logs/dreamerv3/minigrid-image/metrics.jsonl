@@ -1,0 +1,8 @@
+{"step": 165, "time": 30.436378955841064, "episode/length": 164.0, "episode/score": 0.48750001192092896, "episode/reward_rate": 0.006060606060606061, "episode/intrinsic_return": 0.0}
+{"step": 454, "time": 59.34023594856262, "episode/length": 288.0, "episode/score": 0.0, "episode/reward_rate": 0.0, "episode/intrinsic_return": 0.0}
+{"step": 743, "time": 88.25503969192505, "episode/length": 288.0, "episode/score": 0.0, "episode/reward_rate": 0.0, "episode/intrinsic_return": 0.0}
+{"step": 1032, "time": 117.1766095161438, "episode/length": 288.0, "episode/score": 0.0, "episode/reward_rate": 0.0, "episode/intrinsic_return": 0.0}
+{"step": 1100, "time": 153.07061290740967, "eval_episode/length": 288.0, "eval_episode/score": 0.0, "eval_episode/reward_rate": 0.0}
+{"step": 1100, "time": 181.99200916290283, "eval_episode/length": 288.0, "eval_episode/score": 0.0, "eval_episode/reward_rate": 0.0}
+{"step": 1100, "time": 210.924955368042, "eval_episode/length": 288.0, "eval_episode/score": 0.0, "eval_episode/reward_rate": 0.0}
+{"step": 121, "time": 25.991209745407104, "episode/length": 120.0, "episode/score": 0.625, "episode/reward_rate": 0.008264462809917356, "episode/intrinsic_return": 0.0}

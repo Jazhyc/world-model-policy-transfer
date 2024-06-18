@@ -81,6 +81,10 @@ class JAXAgent(embodied.Agent):
       self._once = False
       assert jaxutils.Optimizer.PARAM_COUNTS
       for name, count in jaxutils.Optimizer.PARAM_COUNTS.items():
+        
+        if not count:
+          continue
+        
         mets[f'params_{name}'] = float(count)
     return outs, state, mets
 

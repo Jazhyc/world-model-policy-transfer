@@ -348,6 +348,7 @@ minigrid-test:
     save_every: 1e3
     eval_initial: True
     eval_samples: 1
+  rssm.initial: zeros
   encoder: {mlp_keys: 'direction', cnn_keys: 'image'}
   decoder: {mlp_keys: 'direction', cnn_keys: 'image'}
 

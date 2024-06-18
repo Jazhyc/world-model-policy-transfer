@@ -2,11 +2,9 @@
 import gymnasium as gym
 import matplotlib.pyplot as plt
 
-for index in range(10):
+for index in range(1):
     
-    
-    env = gym.make('MiniGrid-KeyCorridorS3R3-v0', render_mode='human')
+    env = gym.make('MiniGrid-DoorKey-8x8-v0', render_mode='human')
     env.reset()
-
-    # Create environment and save image
-    env.step(env.action_space.sample())
+    
+    input("Press Enter to continue...")

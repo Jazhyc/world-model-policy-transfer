@@ -1,0 +1,13 @@
+{"step": 165, "time": 30.428875207901, "episode/intrinsic_return": 0.0}
+{"step": 165, "time": 30.432779788970947, "episode/score": 0.48750001192092896}
+{"step": 454, "time": 59.33652663230896, "episode/score": 0.0}
+{"step": 454, "time": 59.33251690864563, "episode/intrinsic_return": 0.0}
+{"step": 743, "time": 88.24707436561584, "episode/intrinsic_return": 0.0}
+{"step": 743, "time": 88.2514877319336, "episode/score": 0.0}
+{"step": 1032, "time": 117.16889095306396, "episode/intrinsic_return": 0.0}
+{"step": 1032, "time": 117.17289805412292, "episode/score": 0.0}
+{"step": 1100, "time": 153.0669059753418, "eval_episode/score": 0.0}
+{"step": 1100, "time": 181.98829889297485, "eval_episode/score": 0.0}
+{"step": 1100, "time": 210.9212737083435, "eval_episode/score": 0.0}
+{"step": 121, "time": 25.98775553703308, "episode/score": 0.625}
+{"step": 121, "time": 25.98440170288086, "episode/intrinsic_return": 0.0}
