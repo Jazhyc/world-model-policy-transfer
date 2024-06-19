@@ -2,6 +2,7 @@ import json
 import csv
 import numpy as np
 import math
+import pandas as pd
 
 def process_dreamer_scores(filepath, return_col, step_limit, num_eval_episodes):
     
@@ -37,24 +38,25 @@ def average_scores_within_window(scores, window=200000, step_limit=1e6):
     
     # Dummy value
     averaged_scores.append((0, 0, 0))
-    i = 0
+    index = 0
     
     for step_width in range(0, int(step_limit), window):
         step_sum = 0
         mean_sum = 0
-        std_sum = 0
         count = 0
         
-        while i < len(scores) and scores[i][0] < step_width + window:
-            step, mean, std = scores[i]
+        while index < len(scores) and scores[index][0] < step_width + window:
+            step, mean, _ = scores[index]
             step_sum += step
             mean_sum += mean
-            std_sum += std
             count += 1
-            i += 1
+            index += 1
+            
+        # Calculate the std using mean
+        std = np.std([mean for s, mean, _ in scores if step_width <= s < step_width + window])
         
         if count > 0:
-            averaged_scores.append((step_width + window, mean_sum / count, std_sum / count))
+            averaged_scores.append((step_width + window, mean_sum / count, std))
     
     return averaged_scores
 
@@ -137,3 +139,55 @@ def process_intrinsic_impala_scores(filepath, step_limit=1e6, num_eval_episodes=
         impala_scores.append((step, mean, std))
     
     return impala_scores
+
+def create_df(data, label):
+    df = pd.DataFrame(data, columns=['step', 'mean_return', 'std_error_return'])
+    df['label'] = label
+    return df
+
+def get_dataframe(path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
+    
+    dreamer_logs = '../logs/'
+    dreamer_filename = 'scores.jsonl'
+    dreamer_score_key = 'eval_episode/score'
+    dreamer_intrinsic_score_key = 'episode/intrinsic_return'
+
+    cbet_logs = '../logs/'
+    cbet_filename = 'eval_results.csv'
+    cbet_intrinsic_filename = 'logs.csv'
+    
+    if 'dreamerv3' in path:
+        return process_and_average_scores(
+            base_path=dreamer_logs, 
+            sub_path=path, 
+            filename=dreamer_filename, 
+            process_func=process_dreamer_scores if mode == 'extrinsic' else process_intrinsic_dreamer_scores, 
+            score_key=dreamer_score_key if mode == 'extrinsic' else dreamer_intrinsic_score_key, 
+            step_limit=step_limit, 
+            num_eval_episodes=num_eval_episodes,
+            window=window
+        )
+    elif 'impala' in path:
+        return process_and_average_scores(
+            base_path=cbet_logs, 
+            sub_path=path, 
+            filename=cbet_filename if mode == 'extrinsic' else cbet_intrinsic_filename, 
+            process_func=process_impala_scores if mode == 'extrinsic' else process_intrinsic_impala_scores, 
+            score_key=None, 
+            step_limit=step_limit, 
+            num_eval_episodes=num_eval_episodes,
+            window=window
+        )
+    else:
+        raise ValueError('Invalid path')
+    
+def generate_df(name, path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
+    scores = get_dataframe(path, num_eval_episodes, step_limit, window, mode)
+    return create_df(scores, name)
+
+def generate_dfs(results, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
+    # Generate all and then concatenate
+    dfs = []
+    for name, path in results.items():
+        dfs.append(generate_df(name, path, num_eval_episodes, step_limit, window, mode))
+    return pd.concat(dfs)

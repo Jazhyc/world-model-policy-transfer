@@ -5,76 +5,45 @@ import csv
 import math
 import numpy as np
 
-from file_handler import process_and_average_scores, process_intrinsic_dreamer_scores, process_intrinsic_impala_scores
-from plot_func import plot_scores, create_df
+from file_handler import generate_dfs
+from plot_func import plot_scores
 
-dreamer_logs = '../logs/'
-dreamer_filename = 'scores.jsonl'
-
-cbet_logs = '../logs/impala/'
-cbet_filename = 'logs.csv'
-
-num_eval_episodes = 8
-window_size = 20000    
+window = 100000
 step_limit = 1e6
 
+minigrid_results = {
+    'DreamerV3 (CBET)': 'dreamerv3/unlock-tabula-rasa-1M-2/',
+    'IMPALA (CBET)': 'impala/unlock-tabula-rasa-1M-ego/'
+}
 
-dreamer_cbet_scores = process_and_average_scores(
-    dreamer_logs,
-    'dreamerv3/unlock-tabula-rasa-1M-2/',
-    dreamer_filename,
-    process_intrinsic_dreamer_scores,
-    'episode/intrinsic_return',
-    step_limit,
-    num_eval_episodes,
-    window_size
-)
-
-impala_cbet_scores = process_and_average_scores(
-    cbet_logs,
-    'unlock-tabula-rasa-1M-ego/',
-    cbet_filename,
-    process_intrinsic_impala_scores,
-    None,
-    step_limit,
-    num_eval_episodes,
-    window_size
-)
-
-# Create DataFrames
-df_cbet_dreamer = create_df(dreamer_cbet_scores, 'DreamerV3 (CBET)')
-df_cbet_impala = create_df(impala_cbet_scores, 'IMPALA (CBET)')
-
-# Concatenate the DataFrames
-df = pd.concat([df_cbet_dreamer, df_cbet_impala])
+df = generate_dfs(minigrid_results, mode='intrinsic', window=window, step_limit=step_limit)
 
 # Plot the scores
-plot_scores(df, step_limit, 'intrinsic', 'Minigrid', y_lim=None)
+plot_scores(df, 'Intrinsic', 'Tabula Rasa MiniGrid', y_lim=None)
 
-dreamer_cbet_scores = process_and_average_scores(
-    dreamer_logs,
-    'dreamerv3/crafter-tabula-rasa-1M/',
-    dreamer_filename,
-    process_intrinsic_dreamer_scores,
-    'episode/intrinsic_return',
-    step_limit,
-    num_eval_episodes,
-    window_size
-)
+crafter_results = {
+    'DreamerV3 (CBET)': 'dreamerv3/crafter-coeff-0.001/',
+    'IMPALA (CBET)': 'impala/crafter-tabula-rasa-1M-coeff-0.005/'
+}
 
-impala_cbet_scores = process_and_average_scores(
-    cbet_logs,
-    'crafter-tabula-rasa-1M/',
-    cbet_filename,
-    process_intrinsic_impala_scores,
-    None,
-    step_limit,
-    num_eval_episodes,
-    window_size
-)
+df = generate_dfs(crafter_results, mode='intrinsic', window=window, step_limit=step_limit)
 
-df_cbet_dreamer = create_df(dreamer_cbet_scores, 'DreamerV3 (CBET)')
-df_cbet_impala = create_df(impala_cbet_scores, 'IMPALA (CBET)')
-df = pd.concat([df_cbet_dreamer, df_cbet_impala])
+plot_scores(df, 'Intrinsic', 'Tabula Rasa Crafter', y_lim=None)
 
-plot_scores(df, step_limit, 'intrinsic', 'Crafter', y_lim=None)
+minigrid_transfer_results = {
+    'DreamerV3 (CBET)': 'dreamerv3/minigrid-pretrain-1M-Doorkey8x8/',
+    'IMPALA (CBET)': 'impala/minigrid-pretrain-1M-Doorkey8x8/'
+}
+
+df = generate_dfs(minigrid_transfer_results, mode='intrinsic', window=window, step_limit=step_limit)
+
+plot_scores(df, 'Intrinsic', 'Pre-train MiniGrid', y_lim=None)
+
+crafter_transfer_results = {
+    'DreamerV3 (CBET)': 'dreamerv3/crafter-pretrain-1M/',
+    'IMPALA (CBET)': 'impala/crafter-pretrain-1M/'
+}
+
+df = generate_dfs(crafter_transfer_results, mode='intrinsic', window=window, step_limit=step_limit)
+
+plot_scores(df, 'Intrinsic', 'Pre-train Crafter', y_lim=None)
