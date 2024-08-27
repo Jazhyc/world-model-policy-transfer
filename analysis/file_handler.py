@@ -40,6 +40,9 @@ def average_scores_within_window(scores, window=200000, step_limit=1e6):
     averaged_scores.append((0, 0, 0))
     index = 0
     
+    # Set step limit to min of the last step
+    step_limit = min(step_limit, scores[-1][0])
+    
     for step_width in range(0, int(step_limit), window):
         step_sum = 0
         mean_sum = 0
@@ -86,7 +89,7 @@ def process_impala_scores(filepath, step_limit, num_eval_episodes):
 def process_and_average_scores(base_path, sub_path, filename, process_func, score_key, step_limit=None, num_eval_episodes=None, window=200000):
     filepath = base_path + sub_path + filename
     scores = process_func(filepath, score_key, step_limit, num_eval_episodes) if score_key else process_func(filepath, step_limit, num_eval_episodes)
-    return average_scores_within_window(scores, window)
+    return average_scores_within_window(scores, window, step_limit)
 
 def process_intrinsic_dreamer_scores(filename, return_col, step_limit, num_eval_episodes):
     

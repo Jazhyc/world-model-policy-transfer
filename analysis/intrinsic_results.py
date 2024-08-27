@@ -6,7 +6,7 @@ import math
 import numpy as np
 
 from file_handler import generate_dfs
-from plot_func import plot_scores
+from code.src.dreamerv3.analysis.multi_plot import plot_scores
 
 window = 100000
 step_limit = 1e6
