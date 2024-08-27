@@ -6,9 +6,9 @@
 #SBATCG --partition=gpu
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=32gb
-#SBATCH --job-name=d-m-planning-base
-#SBATCH --array=0-1
-plan_ratio=(256 1024)
+#SBATCH --job-name=crafter-pre-train-backup
+## SBATCH --array=0-1
+# plan_ratio=(256 1024)
 
 module load Python/3.10.8-GCCcore-12.2.0
 module load CUDA/12.1.1
@@ -17,16 +17,19 @@ source $HOME/venvs/dreamerv3/bin/activate
 cd ..
 
 # Minigrid Pre-train
-# python -m dreamerv3 --configs minigrid-pre-train --logdir ./logs/dreamerv3/minigrid-pre-train-1M-Doorkey8x8
+# python -m dreamerv3 --configs minigrid-pre-train --logdir ./logs/dreamerv3/minigrid-pre-train-1M-Doorkey8x8-2
 
 # Minigrid Transfer
 # python -m dreamerv3 --configs minigrid-transfer --logdir ./logs/dreamerv3/minigrid-transfer-1M-Unlock --run.from_checkpoint ./logs/dreamerv3/minigrid-pre-train-1M-Doorkey8x8/checkpoint.ckpt
 
 # Crafter Tabula Rasa / Base (change intrinsic and path)
-python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-tabula-rasa-1M-planning-${plan_ratio[${SLURM_ARRAY_TASK_ID}]} --run.train_ratio ${plan_ratio[${SLURM_ARRAY_TASK_ID}]} --run.intrinsic True
+# python -m dreamerv3 --configs crafter-cbet --logdir ./logs/dreamerv3/minigrid-base --run.intrinsic False
 
 # Crafter Pre-train
-# python -m dreamerv3 --configs crafter-pre-train --logdir ./logs/dreamerv3/crafter-pre-train-1M
+python -m dreamerv3 --configs crafter-pre-train --logdir ./logs/dreamerv3/crafter-pre-train-1M-2
 
 # Crafter Transfer
 # python -m dreamerv3 --configs crafter-transfer --logdir ./logs/dreamerv3/crafter-transfer-1M --run.from_checkpoint ./logs/dreamerv3/crafter-pre-train-1M/checkpoint.ckpt
+
+# Convergence Test
+# python -m dreamerv3 --configs crafter-cbet --logdir ./logs/dreamerv3/crafter-base-2M --run.intrinsic False
