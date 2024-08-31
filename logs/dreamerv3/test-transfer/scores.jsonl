@@ -1,9 +1,0 @@
-{"step": 289, "time": 11.504910707473755, "episode/intrinsic_return": 0.0}
-{"step": 289, "time": 11.508461475372314, "episode/score": 0.0}
-{"step": 578, "time": 11.668642520904541, "episode/intrinsic_return": 0.0}
-{"step": 578, "time": 11.672683477401733, "episode/score": 0.0}
-{"step": 867, "time": 11.828717947006226, "episode/score": 0.0}
-{"step": 867, "time": 11.825061082839966, "episode/intrinsic_return": 0.0}
-{"step": 1100, "time": 12.136483907699585, "eval_episode/score": 0.0}
-{"step": 1100, "time": 12.306700229644775, "eval_episode/score": 0.0}
-{"step": 1100, "time": 12.467372417449951, "eval_episode/score": 0.0}
