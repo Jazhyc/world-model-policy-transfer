@@ -6,7 +6,7 @@
 #SBATCG --partition=gpu
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=32gb
-#SBATCH --job-name=d-m-c-sweep
+#SBATCH --job-name=d-c-c-sweep
 #SBATCH --array=0-4
 # plan_ratio=(256 1024)
 
@@ -23,7 +23,7 @@ cd ..
 # python -m dreamerv3 --configs minigrid-transfer --logdir ./logs/dreamerv3/minigrid-transfer-1M-Unlock --run.from_checkpoint ./logs/dreamerv3/minigrid-pre-train-1M-Doorkey8x8/checkpoint.ckpt
 
 # Crafter Tabula Rasa / Base (change intrinsic and path)
-python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-cbet-sweep-${SLURM_ARRAY_TASK_ID} --run.intrinsic True --seed ${SLURM_ARRAY_TASK_ID}
+python -m dreamerv3 --configs minigrid-unlock --logdir ./logs/dreamerv3/minigrid-cbet-sweep-${SLURM_ARRAY_TASK_ID} --run.intrinsic True --run.intr_reward_coeff 0.001 --seed ${SLURM_ARRAY_TASK_ID}
 
 # Crafter Pre-train
 # python -m dreamerv3 --configs crafter-pre-train --logdir ./logs/dreamerv3/crafter-pre-train-1M-2
