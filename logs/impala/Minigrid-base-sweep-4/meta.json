@@ -39,7 +39,7 @@
         "unroll_length": 100,
         "xpid": "Minigrid-base-sweep-4"
     },
-    "date_end": null,
+    "date_end": "2024-09-01 19:13:19.179433",
     "date_start": "2024-09-01 13:56:27.750792",
     "env": {
         "BASH_ENV": "/usr/share/lmod/lmod/init/bash",
@@ -296,6 +296,6 @@
         "topology_addr_pattern": "switch.node",
         "tres_per_task": "cpu:8"
     },
-    "successful": false,
+    "successful": true,
     "xpid": "Minigrid-base-sweep-4"
 }

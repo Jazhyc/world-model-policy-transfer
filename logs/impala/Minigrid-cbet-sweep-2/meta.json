@@ -39,7 +39,7 @@
         "unroll_length": 100,
         "xpid": "Minigrid-cbet-sweep-2"
     },
-    "date_end": null,
+    "date_end": "2024-09-01 20:14:02.495790",
     "date_start": "2024-09-01 14:32:49.017253",
     "env": {
         "BASH_ENV": "/usr/share/lmod/lmod/init/bash",
@@ -296,6 +296,6 @@
         "topology_addr_pattern": "switch.node",
         "tres_per_task": "cpu:8"
     },
-    "successful": false,
+    "successful": true,
     "xpid": "Minigrid-cbet-sweep-2"
 }
