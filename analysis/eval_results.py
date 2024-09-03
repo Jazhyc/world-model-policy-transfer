@@ -14,10 +14,10 @@ fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 fig.subplots_adjust(wspace=0.1)
 
 minigrid_results = {
-    'DreamerV3 (BASE)': 'dreamerv3/unlock-base/',
-    'DreamerV3 (CBET)': 'dreamerv3/unlock-tabula-rasa-1M-2/',
-    'IMPALA (BASE)': 'impala/unlock-base-1M/',
-    'IMPALA (CBET)': 'impala/unlock-tabula-rasa-1M-ego/'
+    'DreamerV3 (BASE)': 'dreamerv3/minigrid-base-sweep-#/',
+    'DreamerV3 (CBET)': 'dreamerv3/minigrid-cbet-sweep-#/',
+    'IMPALA (BASE)': 'impala/Minigrid-base-sweep-#/',
+    'IMPALA (CBET)': 'impala/Minigrid-cbet-sweep-#/'
 }
 
 df = generate_dfs(minigrid_results, window=window, step_limit=step_limit)

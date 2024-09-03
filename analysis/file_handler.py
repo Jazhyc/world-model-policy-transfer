@@ -148,7 +148,24 @@ def create_df(data, label):
     df['label'] = label
     return df
 
-def get_dataframe(path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
+def average_between_experiments(scores, window, step_limit, num_experiments):
+    
+    if num_experiments == 1:
+        return scores
+    
+    mean_scores = []
+    
+    # Data of the form (step, mean, std)
+    # Iterate over the scores, calculate mean using individual means and std from these. Step is the same
+    for step in range(0, int(step_limit), window):
+        mean = np.mean([mean for s, mean, _ in scores if s == step])
+        std = np.std([mean for s, mean, _ in scores if s == step])
+        mean_scores.append((step, mean, std / np.sqrt(num_experiments)))
+        
+    return mean_scores
+    
+
+def get_dataframe(path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic', num_experiments=5):
     
     dreamer_logs = '../logs/'
     dreamer_filename = 'scores.jsonl'
@@ -159,38 +176,52 @@ def get_dataframe(path, num_eval_episodes=8, step_limit=1e6, window=200000, mode
     cbet_filename = 'eval_results.csv'
     cbet_intrinsic_filename = 'logs.csv'
     
-    if 'dreamerv3' in path:
-        return process_and_average_scores(
-            base_path=dreamer_logs, 
-            sub_path=path, 
-            filename=dreamer_filename, 
-            process_func=process_dreamer_scores if mode == 'extrinsic' else process_intrinsic_dreamer_scores, 
-            score_key=dreamer_score_key if mode == 'extrinsic' else dreamer_intrinsic_score_key, 
-            step_limit=step_limit, 
-            num_eval_episodes=num_eval_episodes,
-            window=window
-        )
-    elif 'impala' in path:
-        return process_and_average_scores(
-            base_path=cbet_logs, 
-            sub_path=path, 
-            filename=cbet_filename if mode == 'extrinsic' else cbet_intrinsic_filename, 
-            process_func=process_impala_scores if mode == 'extrinsic' else process_intrinsic_impala_scores, 
-            score_key=None, 
-            step_limit=step_limit, 
-            num_eval_episodes=num_eval_episodes,
-            window=window
-        )
-    else:
-        raise ValueError('Invalid path')
+    # Create empty object to store scores among all experiments
+    scores = []
     
-def generate_df(name, path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
-    scores = get_dataframe(path, num_eval_episodes, step_limit, window, mode)
+    for i in range(0, num_experiments):
+        
+        # Ternary, replace # with the experiment number otherwise leave it as is
+        exp_path = path.replace('#', str(i)) if '#' in path else path
+    
+        if 'dreamerv3' in path:
+            score = process_and_average_scores(
+                base_path=dreamer_logs, 
+                sub_path=exp_path, 
+                filename=dreamer_filename, 
+                process_func=process_dreamer_scores if mode == 'extrinsic' else process_intrinsic_dreamer_scores, 
+                score_key=dreamer_score_key if mode == 'extrinsic' else dreamer_intrinsic_score_key, 
+                step_limit=step_limit, 
+                num_eval_episodes=num_eval_episodes,
+                window=window
+            )
+        elif 'impala' in path:
+            score = process_and_average_scores(
+                base_path=cbet_logs, 
+                sub_path=exp_path, 
+                filename=cbet_filename if mode == 'extrinsic' else cbet_intrinsic_filename, 
+                process_func=process_impala_scores if mode == 'extrinsic' else process_intrinsic_impala_scores, 
+                score_key=None, 
+                step_limit=step_limit, 
+                num_eval_episodes=num_eval_episodes,
+                window=window
+            )
+        else:
+            raise ValueError('Invalid path', exp_path)
+        
+        scores.append(score)
+        
+    return average_between_experiments(scores, window, step_limit, num_experiments)
+        
+    
+    
+def generate_df(name, path, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic', num_experiments=5):
+    scores = get_dataframe(path, num_eval_episodes, step_limit, window, mode, num_experiments)
     return create_df(scores, name)
 
-def generate_dfs(results, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic'):
+def generate_dfs(results, num_eval_episodes=8, step_limit=1e6, window=200000, mode='extrinsic', num_experiments=5):
     # Generate all and then concatenate
     dfs = []
     for name, path in results.items():
-        dfs.append(generate_df(name, path, num_eval_episodes, step_limit, window, mode))
+        dfs.append(generate_df(name, path, num_eval_episodes, step_limit, window, mode, num_experiments))
     return pd.concat(dfs)
