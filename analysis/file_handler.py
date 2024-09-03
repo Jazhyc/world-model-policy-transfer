@@ -155,11 +155,12 @@ def average_between_experiments(scores, window, step_limit, num_experiments):
     
     mean_scores = []
     
-    # Data of the form (step, mean, std)
+    # Data of the form [(step, mean, std), ...] for each experiment
     # Iterate over the scores, calculate mean using individual means and std from these. Step is the same
-    for step in range(0, int(step_limit), window):
-        mean = np.mean([mean for s, mean, _ in scores if s == step])
-        std = np.std([mean for s, mean, _ in scores if s == step])
+    for i in range(len(scores[0])):
+        step = scores[0][i][0]
+        mean = np.mean([scores[j][i][1] for j in range(num_experiments)])
+        std = np.std([scores[j][i][1] for j in range(num_experiments)])
         mean_scores.append((step, mean, std / np.sqrt(num_experiments)))
         
     return mean_scores
