@@ -204,7 +204,7 @@ crafter-cbet-stress:
     log_keys_max: '^log_achievement_.*'
     log_keys_sum: '^log_reward$'
     script: train_eval
-    steps: 10.02e6
+    steps: 2.02e6
     eval_every: 1e4
     log_every: 1000
     save_every: 1e5
