@@ -151,7 +151,7 @@ def create_df(data, label):
 def average_between_experiments(scores, window, step_limit, num_experiments):
     
     if num_experiments == 1:
-        return scores
+        return scores[0]
     
     mean_scores = []
     
