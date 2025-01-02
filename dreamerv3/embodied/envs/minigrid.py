@@ -1,3 +1,5 @@
+# Code obtained from qxcv: https://gist.github.com/qxcv/e8641342c102c2aa714c9caeca724101
+
 from typing import cast, Any, TypeVar
 import gymnasium
 from minigrid.wrappers import RGBImgObsWrapper, ObservationWrapper, ImgObsWrapper

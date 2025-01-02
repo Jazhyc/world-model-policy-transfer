@@ -34,6 +34,7 @@ def plot_scores(df, reward_type, env_name, y_lim=1.0, step_limit=1e6):
         '64': '#4E79A7',  # Blue
         '256': '#F28E2B',  # Orange
         '1024': '#E15759',  # Red
+        '0' : '#4E79A7',  # Blue
     }
     
     # Triangle for BASE, Square for CBET
@@ -50,8 +51,11 @@ def plot_scores(df, reward_type, env_name, y_lim=1.0, step_limit=1e6):
         model_type = f'({model_type})'
         
         # get the color and shape
-        color = color_dict[model]
-        shape = shape_dict[model_type]
+        # color = color_dict[model]
+        # shape = shape_dict[model_type]
+        
+        # Override for now
+        color = shape = None
         
         # If model type is CBET, make color darker
         if model_type == '(CBET)':
@@ -75,6 +79,7 @@ def plot_scores(df, reward_type, env_name, y_lim=1.0, step_limit=1e6):
     plt.grid()
     plt.ylim(0, y_lim)
     plt.xlim(0, step_limit)
+    plt.title(f"{env_name} {reward_type.capitalize()} Return")
     
     # Format x axis
     formatter = FuncFormatter(lambda x, pos: f'{round(x * 1e-6, 2)}')

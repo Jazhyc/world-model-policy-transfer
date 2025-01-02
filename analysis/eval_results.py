@@ -34,9 +34,9 @@ plot_scores(df, 'Extrinsic', 'Transfer MiniGrid', axs[0, 1], y_lim=1, hide_y_tic
 
 crafter_results = {
     'DreamerV3 (BASE)': 'dreamerv3/crafter-base-sweep-#/',
-    'DreamerV3 (CBET)': 'dreamerv3/crafter-cbet-sweep-#/', # Better than base which uses 0.0025
+    'DreamerV3 (CBET)': 'dreamerv3/crafter-cbet-sweep-#/',
     'IMPALA (BASE)': 'impala/Crafter-base-sweep-#/',
-    'IMPALA (CBET)': 'impala/Crafter-cbet-sweep-#/' # same reason as above
+    'IMPALA (CBET)': 'impala/Crafter-cbet-sweep-#/'
 }
 
 df = generate_dfs(crafter_results, window=window, step_limit=crafter_step_limit)
@@ -68,14 +68,23 @@ for handle, label in zip(handles, labels):
     if label != "mean_return":
         filtered_handles.append(handle)
         filtered_labels.append(label)
+        
+FONT_SIZE = 14
+LEGEND_SIZE = 16
 
 # Add legend below the whole plot with filtered labels and handles
-fig.legend(filtered_handles, filtered_labels, loc='lower center', ncol=4)
+fig.legend(filtered_handles, filtered_labels, loc='lower center', ncol=4, fontsize=LEGEND_SIZE, bbox_to_anchor=(0.5, -0.01))
 
 # make legend visible
 for ax in axs.flat:
     ax.get_legend().remove()
+    
+# Increase font size of all text
+for ax in axs.flat:
+    for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+                 ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontsize(FONT_SIZE)
 
 #fig.legend(handles, labels, loc='lower center', ncol=4)
-plt.savefig('images/combined_plots.png', dpi=600)
+plt.savefig('images/combined_plots_poster.png', dpi=300)
 plt.show()

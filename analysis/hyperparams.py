@@ -52,19 +52,42 @@ from single_plot import plot_scores as single_plot_scores
 
 # plot_scores(df, 'Extrinsic', 'DreamerV3 Crafter', axs[1,1], y_lim=10)
 
-crafter_dreamer_plan = {
-    'BASE 256' : 'dreamerv3/crafter-base-1M-planning-256/',
-    'BASE 1024' : 'dreamerv3/crafter-base-1M-planning-1024/',
-    'BASE 64' : 'dreamerv3/crafter-base-1M/',
-    # Same with cbet
-    'CBET 256' : 'dreamerv3/crafter-tabula-rasa-1M-planning-256/',
-    'CBET 1024' : 'dreamerv3/crafter-tabula-rasa-1M-planning-1024/',
-    'CBET 64' : 'dreamerv3/crafter-coeff-0.001/'
+# crafter_dreamer_plan = {
+#     'BASE 256' : 'dreamerv3/crafter-base-1M-planning-256/',
+#     'BASE 1024' : 'dreamerv3/crafter-base-1M-planning-1024/',
+#     'BASE 64' : 'dreamerv3/crafter-base-1M/',
+#     # Same with cbet
+#     'CBET 256' : 'dreamerv3/crafter-tabula-rasa-1M-planning-256/',
+#     'CBET 1024' : 'dreamerv3/crafter-tabula-rasa-1M-planning-1024/',
+#     'CBET 64' : 'dreamerv3/crafter-coeff-0.001/'
+# }
+
+# df = generate_dfs(crafter_dreamer_plan, window=200000, step_limit=1e6)
+
+# single_plot_scores(df, 'Extrinsic', 'Crafter', y_lim=10)
+
+# crafter_dreamer_coeff_0 = {
+#     'DreamerV3 (CBET)' : 'dreamerv3/crafter-cbet-0-coeff/',
+# }
+
+# crafter_base = {
+#     'DreamerV3 (BASE)' : 'dreamerv3/crafter-base-sweep-#/',
+# }
+
+# df_base = generate_dfs(crafter_base, window=200000, step_limit=1e6, num_experiments=5)
+# df_cbet = generate_dfs(crafter_dreamer_coeff_0, window=200000, step_limit=1e6, num_experiments=1)
+
+# # combine the two dataframes
+# df = pd.concat([df_base, df_cbet])
+
+# single_plot_scores(df, 'Extrinsic', 'Crafter', y_lim=12)
+
+crafter_2m = {
+    'DreamerV3 (CBET)' : 'dreamerv3/crafter-cbet-2M/',
+    'DreamerV3 (BASE)' : 'dreamerv3/crafter-base-2M/',
 }
 
-df = generate_dfs(crafter_dreamer_plan, window=200000, step_limit=1e6)
-
-single_plot_scores(df, 'Extrinsic', 'Crafter', y_lim=10)
+single_plot_scores(generate_dfs(crafter_2m, window=200000, step_limit=2e6, num_experiments=1), 'Extrinsic', '2M Crafter', y_lim=14, step_limit=2e6)
 
 # long_crafter_comparison = {
 #     'DreamerV3 (CBET)' : 'dreamerv3/crafter-coeff-0.001/',
