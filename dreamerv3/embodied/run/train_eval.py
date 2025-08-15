@@ -125,6 +125,10 @@ def train_eval(
     checkpoint.load(args.from_checkpoint)
     
     if args.transfer:
+      # Reset the step counter to zero if transfer 
+      # (otherwise it will continue from the step where the checkpoint was saved, 
+      # and stop training after args.steps - step.value steps, rather than args.steps)
+      step.value = 0
             
       # Set agent to transfer mode, nesting is necessary for some reason
       agent.agent.set_transfer(True)

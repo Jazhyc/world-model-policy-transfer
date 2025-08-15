@@ -188,7 +188,7 @@ crafter-cbet:
     steps: 1.02e6
     eval_every: 1e4
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     use_pseudocounts: True
     eval_eps: 8
@@ -207,7 +207,7 @@ crafter-cbet-stress:
     steps: 2.02e6
     eval_every: 1e4
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     use_pseudocounts: True
     eval_eps: 8
@@ -227,7 +227,7 @@ crafter-pre-train:
     steps: 1.02e6
     eval_every: 1e4
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -250,7 +250,7 @@ crafter-transfer:
     steps: 1.02e6
     eval_every: 1e4
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -318,7 +318,7 @@ minigrid:
     eval_every: 1e4
     train_ratio: 64
     log_every: 300
-    save_every: 1e4
+    save_every: 900
     eval_initial: True
     eval_eps: 5
     eval_samples: 1
@@ -334,7 +334,7 @@ minigrid-unlock:
     eval_every: 1e4
     train_ratio: 64
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -350,7 +350,7 @@ minigrid-unlock-stress:
     eval_every: 1e4
     train_ratio: 64
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -366,7 +366,7 @@ minigrid-pre-train:
     eval_every: 1e4
     train_ratio: 64
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -385,7 +385,7 @@ minigrid-transfer:
     eval_every: 1e4
     train_ratio: 64
     log_every: 1000
-    save_every: 1e5
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -405,7 +405,7 @@ minigrid-unlock-pickup:
     eval_every: 1e4
     train_ratio: 64
     log_every: 500
-    save_every: 1e4
+    save_every: 900
     eval_initial: True
     eval_eps: 8
     eval_samples: 1
@@ -421,7 +421,7 @@ minigrid-test:
     eval_every: 1e3
     train_ratio: 64
     log_every: 500
-    save_every: 1e3
+    save_every: 900
     eval_initial: True
     eval_samples: 1
   rssm.initial: zeros
